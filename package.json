@@ -1,0 +1,29 @@
+{
+  "name": "rc-landing-page-api",
+  "version": "1.0.0",
+  "description": "Serverless APIS deployed to Vercel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/firestore": "^7.11.0",
+    "@vercel/node": "^5.1.10",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "firebase": "^11.4.0",
+    "googleapis": "^146.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/node": "^22.13.5",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
+    "eslint": "^9.21.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
