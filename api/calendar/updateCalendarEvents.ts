@@ -1,18 +1,19 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import CalendarService from '../../../services/calendarService';
-import { corsMiddleware } from '../../../middleware/corsMiddleware';
-import { headerMiddleware } from '../../../middleware/headerMiddleware';
+import fetchGoogleCalendarEvents from '../../services/calendarService';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  await corsMiddleware(req, res, async () => {
-    await headerMiddleware(req, res, async () => {
-      try {
-        const events = await CalendarService.getGoogleCalendarEvents('your-calendar-id');
-        await CalendarService.writeEventsToFirestore(events);
-        res.status(200).json({ message: 'Calendar events updated successfully' });
-      } catch (error) {
-        res.status(500).json({ error: 'Failed to update calendar events' });
-      }
-    });
-  });
-}
+export default async function updateCalendarEvents(req: VercelRequest, res: VercelResponse) {
+  const calendarId = process.env.GOOGLE_CALENDAR_ID;
+
+    if (!calendarId) {
+        return res.status(400).json({ error: 'Calendar ID is required' });
+    }
+
+    try {
+        const events = await fetchGoogleCalendarEvents(calendarId);
+
+        res.status(200).json({ events });
+    } catch (error) {
+        console.error('Error fetching calendar events:', error.message);
+        res.status(500).json({ error: 'Failed to fetch calendar events' });
+    }
+} 
