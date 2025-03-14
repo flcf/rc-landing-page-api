@@ -1,59 +1,28 @@
 import { google } from 'googleapis';
 import { Firestore } from '@google-cloud/firestore';
-
+import path from 'path';
+import { readFileSync } from 'fs';
 const firestore = new Firestore();
 
-class CalendarService {
-    private calendar;
+export default async function getCalendarEvents(calendarId: string) {
+    const credentials = JSON.parse(
+        readFileSync(path.resolve('./secure/service-account-key.json'), 'utf8')
+    );
 
-    constructor() {
-        this.calendar = google.calendar({ version: 'v3', auth: 'YOUR_GOOGLE_API_KEY' });
-    }
+    const auth = new google.auth.GoogleAuth({
+        credentials,
+        scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
+    });
 
-    async getGoogleCalendarEvents(calendarId: string) {
-        try {
-            const response = await this.calendar.events.list({
-                calendarId: calendarId,
-                timeMin: (new Date()).toISOString(),
-                maxResults: 10,
-                singleEvents: true,
-                orderBy: 'startTime',
-            });
-            return response.data.items;
-        } catch (error) {
-            console.error('Error fetching Google Calendar events:', error);
-            throw error;
-        }
-    }
+    const calendar = google.calendar({ version: 'v3', auth });
 
-    async writeEventsToFirestore(events: any[]) {
-        try {
-            const batch = firestore.batch();
-            events.forEach(event => {
-                const docRef = firestore.collection('events').doc(event.id);
-                batch.set(docRef, event);
-            });
-            await batch.commit();
-            console.log('Events written to Firestore');
-        } catch (error) {
-            console.error('Error writing events to Firestore:', error);
-            throw error;
-        }
-    }
+    const params = {
+        calendarId,
+        maxResults: 50,
+        singleEvents: true,
+        orderBy: 'startTime',
+    };
 
-    async readEventsFromFirestore() {
-        try {
-            const snapshot = await firestore.collection('events').get();
-            const events: any[] = [];
-            snapshot.forEach(doc => {
-                events.push(doc.data());
-            });
-            return events;
-        } catch (error) {
-            console.error('Error reading events from Firestore:', error);
-            throw error;
-        }
-    }
+    const response = await calendar.events.list(params);
+    return response.data.items;
 }
-
-export default new CalendarService();
