@@ -4,7 +4,7 @@ import path from 'path';
 import { readFileSync } from 'fs';
 const firestore = new Firestore();
 
-export default async function getCalendarEvents(calendarId: string) {
+export default async function fetchGoogleCalendarEvents(calendarId: string) {
     const credentials = JSON.parse(
         readFileSync(path.resolve('./secure/service-account-key.json'), 'utf8')
     );
