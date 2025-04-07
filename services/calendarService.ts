@@ -1,13 +1,15 @@
 import { google } from 'googleapis';
 import { Firestore } from '@google-cloud/firestore';
-import path from 'path';
-import { readFileSync } from 'fs';
 const firestore = new Firestore();
 
 export default async function fetchGoogleCalendarEvents(calendarId: string) {
-    const credentials = JSON.parse(
-        readFileSync(path.resolve('./secure/service-account-key.json'), 'utf8')
-    );
+    const serviceAccountKey = process.env.GCAL_SERVICE_ACCOUNT_KEY
+
+    if (!serviceAccountKey) {
+        throw new Error('Service account key is missing');
+      }
+      
+    const credentials = JSON.parse(serviceAccountKey);
 
     const auth = new google.auth.GoogleAuth({
         credentials,
