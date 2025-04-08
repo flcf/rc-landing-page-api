@@ -4,7 +4,9 @@
   "description": "Serverless APIS deployed to Vercel",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "dev": "vercel dev",   
+  "build": "tsc",            
+  "deploy": "vercel deploy"
   },
   "keywords": [],
   "author": "",
