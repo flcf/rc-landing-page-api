@@ -25,6 +25,12 @@ export default async function fetchGoogleCalendarEvents(calendarId: string) {
         orderBy: 'startTime',
     };
 
-    const response = await calendar.events.list(params);
-    return response.data.items;
+    try {
+        const response = await calendar.events.list(params);
+        console.log('API Response:', response.data); // Log the API response
+        return response.data.items;
+    } catch (error: any) {
+        console.error('Error fetching calendar events:', error.response?.data || error.message);
+        throw error;
+    }
 }
