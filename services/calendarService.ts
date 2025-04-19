@@ -17,7 +17,7 @@ export default async function fetchGoogleCalendarEvents(calendarId: string) {
     });
 
     const calendar = google.calendar({ version: 'v3', auth });
-
+    console.log('Calendar ID:', calendarId); // Log the calendar ID for debugging
     const params = {
         calendarId,
         maxResults: 50,

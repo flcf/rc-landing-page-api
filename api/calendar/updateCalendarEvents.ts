@@ -30,7 +30,7 @@ export default async function updateCalendarEvents(req: VercelRequest, res: Verc
     }
 
     //TODO: update Firestore with Calendar Events 
-    //CREATE a script for this to run automatically every 4 days 
+
     //should there be a cleanup function to remove events from firestore?
 
 
