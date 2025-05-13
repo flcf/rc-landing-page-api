@@ -8,6 +8,6 @@
       "rootDir": "./",             // Root directory for source files
       "moduleResolution": "node"  // Resolve modules like Node.js
     },
-    "include": ["api/**/*", "services/**/*"],
+    "include": ["api/**/*", "services/**/*", "shared/**/*"],
     "exclude": ["node_modules", "dist"]
   }

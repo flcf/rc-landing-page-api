@@ -1,0 +1,14 @@
+import rateLimit from 'express-rate-limit';
+import { VercelRequest, VercelResponse } from '@vercel/node';
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests, please try again later.',
+  standardHeaders: true, 
+  legacyHeaders: false, 
+});
+
+export const rateLimitMiddleware = (req: VercelRequest, res: VercelResponse, next: (err?: any) => any) => {
+  limiter(req as any, res as any, next);
+};
