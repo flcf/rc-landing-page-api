@@ -21,7 +21,7 @@ export default async function syncCalendarEvents(req: VercelRequest, res: Vercel
             fetchGoogleCalendarEvents(calendarIdCal)
         ]);
 
-        res.status(200).json({ message: 'Calendar events fetched successfully' });
+        console.log('Calendar events fetched successfully.');
 
         const formattedEvents = [
             { events: allEvents[0], branch: 'Vancouver' },
@@ -29,11 +29,13 @@ export default async function syncCalendarEvents(req: VercelRequest, res: Vercel
         ];
 
         await sendInternalEventsToStore(formattedEvents);
-        console.log('Events successfully synced to Firestore');
+        console.log('Events successfully synced to Firestore.');
+
+        res.status(200).json({ message: 'calendar event sync complete.' });
 
     } catch (error: any) {
         console.error(error.message);
-        res.status(500).json({ error: 'Failed to sync calendar events' });
+        res.status(500).json({ error: 'Failed to sync calendar events.' });
     }
 
 
