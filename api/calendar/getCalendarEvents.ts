@@ -1,17 +1,17 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import CalendarService from '../../services/calendarService';
+import { readEventsFromFirestore } from '../../services/calendarService';
 import { corsMiddleware } from '../../middleware/corsMiddleware';
-import { headerMiddleware } from '../../middleware/headerMiddleware';
+import { rateLimitMiddleware } from '../../middleware/rateLimitMiddleware';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  await corsMiddleware(req, res, async () => {
-    await headerMiddleware(req, res, async () => {
-      // try {
-      //   const events = await CalendarService.readEventsFromFirestore();
-      //   res.status(200).json(events);
-      // } catch (error) {
-      //   res.status(500).json({ error: 'Failed to retrieve calendar events' });
-      // }
-    });
-  });
+export default async function getCalendarEvents(req: VercelRequest, res: VercelResponse) {
+      try {
+        const events = await readEventsFromFirestore();
+        res.status(200).json(events);
+      } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve calendar events' });
+      }
+
+
 }
+
+//TODO: Add back CORS and rate limiting middleware
