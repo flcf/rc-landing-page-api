@@ -1,6 +1,8 @@
 import { google, calendar_v3  } from 'googleapis';
 import { Firestore } from '@google-cloud/firestore';
-import { extractEventLink, getTimezone } from '../shared/helpers';
+import { extractEventLink, generateDocumentKey, getTimezone } from '../shared/helpers';
+import { EventSchema } from './schemas/eventSchema';
+
 type Schema$Event = calendar_v3.Schema$Event;
 
 const calendarServiceAccountKey = process.env.GCAL_SERVICE_ACCOUNT_KEY;
@@ -62,21 +64,32 @@ export async function sendInternalEventsToStore(calendars: { events: Schema$Even
 
     allEvents.forEach((event: Schema$Event & { branch: string }) => {
         try {
-            if (!event.iCalUID) {
-                throw new Error(`Missing iCalUID for event with ID: ${event.id}`);
+            const validationResult = EventSchema.safeParse(event);
+
+            if (!validationResult.success) {
+                console.warn(`Skipping invalid event: ${event.iCalUID}`);
+                console.warn('Validation errors:', validationResult.error.errors);
+                return;
             }
 
-            const eventRef = eventsCollection.doc(event.iCalUID);
+            const validEvent = validationResult.data;
+
+            const documentKey = generateDocumentKey(validEvent.id, validEvent.iCalUID);
+
+            const eventRef = eventsCollection.doc(documentKey);
             batch.set(eventRef, {
-                id: event.id,
-                title: event.summary || 'No Title',
-                startTime: event.start?.dateTime || event.start?.date,
-                endTime: event.end?.dateTime || event.end?.date,
-                timezone: getTimezone(event.start?.timeZone || 'UTC'),
-                location: event.location || 'No Location',
-                branch: event.branch,
+                title: validEvent.summary,
+                startTime: validEvent.start.dateTime
+                ? new Date(validEvent.start.dateTime).toISOString() 
+                : validEvent.start.date,
+            endTime: validEvent.end.dateTime
+                ? new Date(validEvent.end.dateTime).toISOString() 
+                :validEvent.end.date, 
+                timezone: validEvent.start.timeZone ? getTimezone(validEvent.start.timeZone) : null,
+                location: validEvent.location,
+                branch: validEvent.branch,
                 source: "internal",
-                eventLink: extractEventLink(event.description || ''),
+                eventLink: extractEventLink(validEvent.description),
             });
         } catch (error: any) {
             console.error(`Error processing event: ${error.message}`);
