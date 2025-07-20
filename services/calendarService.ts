@@ -2,15 +2,19 @@ import { google, calendar_v3  } from 'googleapis';
 import { Firestore } from '@google-cloud/firestore';
 import { extractEventLink, generateDocumentKey, getTimezone } from '../shared/helpers';
 import { EventSchema } from './schemas/eventSchema';
+import 'dotenv/config';
 
 type Schema$Event = calendar_v3.Schema$Event;
 
-const calendarServiceAccountKey = process.env.GCAL_SERVICE_ACCOUNT_KEY;
-const firebaseAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+const calendarServiceAccountKeyRaw = process.env.GCAL_SERVICE_ACCOUNT_KEY;
+const firebaseAccountKeyRaw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
-if (!calendarServiceAccountKey || !firebaseAccountKey) {
+if (!calendarServiceAccountKeyRaw || !firebaseAccountKeyRaw) {
     throw new Error('account key is missing');
 }
+
+const calendarServiceAccountKey = Buffer.from(calendarServiceAccountKeyRaw || '', 'base64').toString('utf-8');
+const firebaseAccountKey = Buffer.from(firebaseAccountKeyRaw || '', 'base64').toString('utf-8');
 
 const credentials = JSON.parse(calendarServiceAccountKey);
 const firebaseCredentials =  JSON.parse(firebaseAccountKey);
@@ -136,21 +140,23 @@ export async function setupCalendarWatch(calendarId: string) {
     });
   
     const calendar = google.calendar({ version: 'v3', auth });
+
+    const channelId = calendarId == process.env.VANCOUVER_CALENDAR_ID ? process.env.VANCOUVER_CHANNEL_ID : process.env.CALGARY_CHANNEL_ID;
   
     try {
       const response = await calendar.events.watch({
         calendarId,
         requestBody: {
-          id: `channel-${calendarId}-${Date.now()}`,
+          id: channelId,
           type: 'webhook',
-          address: 'https://rc-landing-page-api.vercel.app/api/calendarWebhook', 
+          address: `https://rc-landing-page-api.vercel.app/api/calendar/calendarWebhook`, 
         },
       });
   
       console.log('Watch channel created:', response.data);
       return response.data;
     } catch (error: any) {
-      console.error('Error setting up calendar watch:', error.message);
+      console.error('Error setting up calendar watch:', error.response);
       throw error;
     }
   }

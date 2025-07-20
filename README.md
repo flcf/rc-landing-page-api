@@ -9,3 +9,7 @@ vercel dev
 To deploy Vercel project directly to prod and test, run: 
 
 vercel --prod
+
+To get latest environment variables 
+
+vercel env pull .env 
