@@ -39,12 +39,6 @@ export default async function syncCalendarEvents(req: VercelRequest, res: Vercel
     }
 
 
-    //should there be a cleanup function to remove events from firestore?
-
-    //THIS IS A JOB that runs every so often to update the events in Firestore, ignore duplicates!
-
-    
-
 
 
 } 
