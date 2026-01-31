@@ -4,7 +4,7 @@ import cors from 'cors';
 const allowedOrigins = ['rootscollectivecanada.com'];
 
 const corsOptions = {
-  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+  origin(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
