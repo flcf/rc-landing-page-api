@@ -20,5 +20,7 @@ export const EventSchema = z.object({
     .refine((data) => data.dateTime || data.date, { message: 'Either dateTime or date must be provided for end' }),
   location: z.string().nonempty('Location is required'),
   branch: z.string().nonempty('Branch is required'),
-  description: z.string().nonempty(),
+  description: z.string().nonempty('Description is required'),
 });
+
+export type Event = z.infer<typeof EventSchema>;

@@ -1,7 +1,7 @@
 import { google, calendar_v3 } from 'googleapis';
 import { Firestore } from '@google-cloud/firestore';
 import { extractEventLink, generateDocumentKey, getTimezone } from '../shared/helpers';
-import { EventSchema } from './schemas/eventSchema';
+import { EventSchema, Event } from './schemas/eventSchema';
 import 'dotenv/config';
 
 type Schema$Event = calendar_v3.Schema$Event;
@@ -59,7 +59,7 @@ export async function sendInternalEventsToStore(calendars: { events: Schema$Even
   const batch = firestore.batch();
   const eventsCollection = firestore.collection('calendarEvents');
 
-  const allEvents = calendars.flatMap((calendar) =>
+  const allEvents: (Schema$Event & { branch: string })[] = calendars.flatMap((calendar) =>
     calendar.events.map((event: Schema$Event) => ({
       ...event,
       branch: calendar.branch,
@@ -76,7 +76,7 @@ export async function sendInternalEventsToStore(calendars: { events: Schema$Even
         return;
       }
 
-      const validEvent = validationResult.data;
+      const validEvent: Event = validationResult.data;
 
       const documentKey = generateDocumentKey(validEvent.id, validEvent.iCalUID);
 
@@ -100,12 +100,12 @@ export async function sendInternalEventsToStore(calendars: { events: Schema$Even
   console.log('Events successfully synced to Firestore');
 }
 
-export async function readEventsFromFirestore() {
+export async function readEventsFromFirestore(): Promise<Event[]> {
   try {
     const eventsCollection = firestore.collection('calendarEvents');
     const threeMonthsAgoISO = new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString();
     const snapshot = await eventsCollection.where('startTime', '>=', threeMonthsAgoISO).orderBy('startTime', 'asc').get();
-    const events: any[] = [];
+    const events: Event[] = [];
 
     if (snapshot.empty) {
       console.warn('No events found in Firestore.');
@@ -114,7 +114,7 @@ export async function readEventsFromFirestore() {
 
     snapshot.forEach((doc) => {
       try {
-        events.push({ id: doc.id, ...doc.data() });
+        events.push({ id: doc.id, ...doc.data() } as Event);
       } catch (docError) {
         console.error(`Error processing document with ID ${doc.id}:`, docError);
       }
