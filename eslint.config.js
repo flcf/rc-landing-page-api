@@ -10,6 +10,7 @@ export default tseslint.config(
     rules: {
       quotes: ['error', 'single'],
       'object-shorthand': ['error', 'always'],
+      'object-curly-spacing': ['error', 'always'],
       '@typescript-eslint/no-explicit-any': ['warn'],
     },
   },

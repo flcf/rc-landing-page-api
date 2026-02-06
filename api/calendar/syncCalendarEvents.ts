@@ -15,13 +15,16 @@ export default async function syncCalendarEvents(req: VercelRequest, res: Vercel
     console.log('Manual or cron-triggered sync initiated');
   }
   try {
-    const allEvents = await Promise.all([fetchGoogleCalendarEvents(calendarIdVan), fetchGoogleCalendarEvents(calendarIdCal)]);
+    const [vancouverEvents, calgaryEvents] = await Promise.all([
+      fetchGoogleCalendarEvents(calendarIdVan),
+      fetchGoogleCalendarEvents(calendarIdCal),
+    ]);
 
     console.log('Calendar events fetched successfully.');
 
     const formattedEvents = [
-      { events: allEvents[0], branch: 'Vancouver' },
-      { events: allEvents[1], branch: 'Calgary' },
+      { events: vancouverEvents, branch: 'Vancouver' },
+      { events: calgaryEvents, branch: 'Calgary' },
     ];
 
     await sendInternalEventsToStore(formattedEvents);
@@ -29,7 +32,7 @@ export default async function syncCalendarEvents(req: VercelRequest, res: Vercel
 
     res.status(200).json({ message: 'calendar event sync complete.' });
   } catch (error: any) {
-    console.error(error.message);
+    console.error(error);
     res.status(500).json({ error: 'Failed to sync calendar events.' });
   }
 }
