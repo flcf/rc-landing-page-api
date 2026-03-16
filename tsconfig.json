@@ -1,13 +1,15 @@
 {
-    "compilerOptions": {
-      "target": "ES2020",          // Target modern JavaScript
-      "module": "commonjs",        // Use CommonJS for serverless functions
-      "strict": true,              // Enable strict type checking
-      "esModuleInterop": true,     // Allow default imports from CommonJS modules
-      "outDir": "./dist",          // Output directory for compiled files
-      "rootDir": "./",             // Root directory for source files
-      "moduleResolution": "node"  // Resolve modules like Node.js
-    },
-    "include": ["api/**/*", "services/**/*", "shared/**/*"],
-    "exclude": ["node_modules", "dist"]
-  }
+  "compilerOptions": {
+    "target": "ES2020", // Target modern JavaScript
+    "module": "commonjs", // Use CommonJS for serverless functions
+    "strict": true, // Enable strict type checking
+    "esModuleInterop": true, // Allow default imports from CommonJS modules
+    "outDir": "./dist", // Output directory for compiled files
+    "rootDir": "./", // Root directory for source files
+    "moduleResolution": "node", // Resolve modules like Node.js
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": ["api/**/*", "services/**/*", "shared/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
