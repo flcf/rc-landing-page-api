@@ -1,9 +1,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { readEventsFromFirestore } from '../../services/calendarService';
-import { corsMiddleware } from '../../middleware/corsMiddleware';
-import { rateLimitMiddleware } from '../../middleware/rateLimitMiddleware';
+import withMiddleware from '../../middleware';
 
-export default async function getCalendarEvents(req: VercelRequest, res: VercelResponse) {
+async function getCalendarEvents(req: VercelRequest, res: VercelResponse) {
   try {
     const events = await readEventsFromFirestore();
     res.status(200).json(events);
@@ -12,4 +11,4 @@ export default async function getCalendarEvents(req: VercelRequest, res: VercelR
   }
 }
 
-//TODO: Add back CORS and rate limiting middleware
+export default withMiddleware(getCalendarEvents);

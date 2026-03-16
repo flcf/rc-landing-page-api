@@ -9,6 +9,7 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
+// TODO: Rewrite - vercel edge functions don't offer any "next" callback param
 export const rateLimitMiddleware = (req: VercelRequest, res: VercelResponse, next: (err?: any) => any) => {
   limiter(req as any, res as any, next);
 };
